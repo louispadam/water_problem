@@ -1,0 +1,6 @@
+*main*
+*.asv
+*private*
+*experiment*
+images
+*.png
