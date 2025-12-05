@@ -36,6 +36,8 @@ end
     ylabel(ax,'Y');
     xlabel(ax,'X');
     title(ax,tit,'Fontsize',18,'FontWeight', 'bold')
+    xlim(ax,[-pi pi]);
+    ylim(ax,[-pi pi]);
 
     return_data = ax;
 

@@ -26,8 +26,8 @@ end
     % Set up Fourier Transform
     %******************************
 
-    x = linspace(-1, 1, n_x);
-    y = linspace(-1, 1, n_y);
+    x = linspace(-pi, pi, n_x);
+    y = linspace(-pi, pi, n_y);
 
     dx = x(2) - x(1);
     dy = y(2) - y(1);
@@ -78,10 +78,7 @@ end
 
     By = parameters.B(y);
     sg_x = exp(1i*dt*freq_x.*By');
-    %Ax = fftshift(parameters.A(x));
     Ax = parameters.A(x);
-    %figure(10)
-    %plot(x,Ax)
     sg_y = exp(1i*dt*Ax.*freq_y');
 
     for step = 2:steps

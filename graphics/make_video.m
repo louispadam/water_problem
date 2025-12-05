@@ -1,4 +1,4 @@
-function return_data = animate(x,y,S,parameters,axis,options)
+function return_data = make_video(x,y,S,tr,parameters,fig,options)
 %ANIMATE Animate a collection of simulations. Accepts a cell array, each
 %element of which is an 2d array of data: time x particle.
 %
@@ -7,8 +7,9 @@ arguments (Input)
     x                       % discretization in x-coordinate
     y                       % discretization in y-coordinate
     S                       % surface to plot
+    tr                      % trajectory to trace
     parameters struct       % parameters used for simulation
-    axis                    % axis to format
+    fig                     % figure to work from
 end
 arguments (Input)
     options.Title = ""      % title of axis
@@ -20,7 +21,8 @@ end
     % Collect Inputs
     %****************************
 
-    ax = axis;
+    clf(fig);
+    ax = axes(fig);
     tit = options.Title;
     time = options.Time;
     tr = options.Trajectory;
@@ -31,11 +33,14 @@ end
     dt=parameters.dt;       % simulation time step
     tt=0;               % current time
     ptfac=parameters.fr;    % frame rate
-    pr = parameters.pr;     % pause rate
 
     %****************************
     % Run Animation
     %****************************
+
+    v = VideoWriter('output.mp4','MPEG-4');
+    v.FrameRate = 30;         % Adjust for smoothness
+    open(v);
 
     [X, Y] = meshgrid(x,y);
 
@@ -60,7 +65,7 @@ end
     colorbar;
 
     if ~isempty(tr)
-
+        
         hold on
         m = plot3(tr(1,1), tr(2,1), tr(3,1), 'r');
 
@@ -92,14 +97,12 @@ end
                 m.ZData = tr(3,1:ind);
             end
 
-            drawnow limitrate
-
             % Update annotation tracking time
             if ~isempty(time)
                 a.String = sprintf('Time: %.2f',time(ind));
             end
             
-            pause(pr);
+            writeVideo(v, getframe(fig));
 
         end
         tt=tt+dt; % Update time
