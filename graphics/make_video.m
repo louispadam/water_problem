@@ -1,4 +1,4 @@
-function return_data = make_video(x,y,S,tr,parameters,fig,options)
+function return_data = make_video(x,y,S,parameters,fig,options)
 %ANIMATE Animate a collection of simulations. Accepts a cell array, each
 %element of which is an 2d array of data: time x particle.
 %
@@ -7,7 +7,6 @@ arguments (Input)
     x                       % discretization in x-coordinate
     y                       % discretization in y-coordinate
     S                       % surface to plot
-    tr                      % trajectory to trace
     parameters struct       % parameters used for simulation
     fig                     % figure to work from
 end

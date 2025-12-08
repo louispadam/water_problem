@@ -78,8 +78,11 @@ end
 
     By = parameters.B(y);
     sg_x = exp(1i*dt*freq_x.*By');
-    Ax = parameters.A(x);
-    sg_y = exp(1i*dt*Ax.*freq_y');
+
+    track = zeros([1,sz]);
+
+    ef = angle_to_vec(parameters.ef_angle);
+    c = ff_influence(x);
 
     for step = 2:steps
 
@@ -90,7 +93,17 @@ end
         X_n12 = X_n0 .* sg_x;
 
         % invert Fourier in x
-        U = ifft(X_n12,[],2);
+        U = real(ifft(X_n12,[],2));
+
+        no_vel = trapz(U,1);
+        real_interaction = conv(c,no_vel,"same");
+        Ax = -real_interaction/max(real_interaction);
+        %Ax = parameters.A(x,ef,U);
+        %if mod(step,1000) == 0
+        %    figure(round(step/1000))
+        %    plot(x,Ax)
+        %end
+        sg_y = exp(1i*dt*Ax.*freq_y');
 
         % apply Fourier in y
         Y_n12 = fft(U,[],1);
@@ -105,6 +118,9 @@ end
 
         % Store result at previously calculated frequency
         if step == here
+            [~, ind] = max(Ax);
+            track(k) = ind;
+            %track(k) = trapz((no_vel-no_vel0).^2);
             time(k) = tt;
             data(k,:,:) = real(U);
             k = k+1;
@@ -113,11 +129,14 @@ end
 
         % display update if desired
         if ud && step == pb(n_pb)
-            fprintf('Simulation Progress: %3.0f%%\n',100*step/steps)
+            fprintf('%d  Simulation Progress: %3.0f%%\n',step,100*step/steps)
             n_pb = n_pb + 1;
         end
 
     end
+
+    figure(50)
+    plot(time,track)
 
     % Return data
     return_time = time;
