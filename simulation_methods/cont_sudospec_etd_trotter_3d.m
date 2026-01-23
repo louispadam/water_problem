@@ -1,4 +1,4 @@
-function [return_time, return_data]=cont_sudospec_etd_trotter(initial,parameters)
+function [return_time, return_data]=cont_sudospec_etd_trotter_3d(initial,parameters)
 %
 %last updated 11/07/25 by Adam Petrucci
 arguments

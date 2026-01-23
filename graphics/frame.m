@@ -12,6 +12,8 @@ arguments (Input)
 end
 arguments (Input)
     options.Title = ""                      % title of axis
+    options.xaxis = "X"
+    options.yaxis = "Y"
 end
 
     %****************************
@@ -20,6 +22,8 @@ end
 
     ax = axis;
     tit = options.Title;
+    xlab = options.xaxis;
+    ylab = options.yaxis;
 
     %****************************
     % Construct Figures
@@ -33,8 +37,12 @@ end
     colorbar;
 
     % Parameters for plot
-    ylabel(ax,'Y');
-    xlabel(ax,'X');
+    if ylab~="none"
+        ylabel(ax,ylab);
+    end
+    if xlab~="none"
+        xlabel(ax,xlab);
+    end
     title(ax,tit,'Fontsize',18,'FontWeight', 'bold')
     xlim(ax,[-pi pi]);
     ylim(ax,[-pi pi]);
