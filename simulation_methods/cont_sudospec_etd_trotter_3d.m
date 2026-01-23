@@ -19,21 +19,21 @@ end
     %****************************
     msz = parameters.m_sz;
     ud = parameters.update;
-    n_x = parameters.N_x;
-    n_y = parameters.N_y;
+    n_omega = parameters.N_x;
+    n_theta = parameters.N_y;
 
     %******************************
     % Set up Fourier Transform
     %******************************
 
-    x = linspace(-pi, pi, n_x);
-    y = linspace(-pi, pi, n_y);
+    omega = linspace(-pi, pi, n_omega);
+    theta = linspace(-pi, pi, n_theta);
 
-    dx = x(2) - x(1);
-    dy = y(2) - y(1);
+    domega = omega(2) - omega(1);
+    dtheta = theta(2) - theta(1);
 
-    freq_x = fftshift( (-n_x/2 : n_x/2-1) / (n_x*dx) );
-    freq_y = fftshift( (-n_y/2 : n_y/2-1) / (n_y*dy) );
+    freq_omega = fftshift( (-n_omega/2 : n_omega/2-1) / (n_omega*domega) );
+    freq_theta = fftshift( (-n_theta/2 : n_theta/2-1) / (n_theta*dtheta) );
 
     %***************************************************
     % Set up iteration
@@ -76,11 +76,11 @@ end
         fprintf("Began Simulation\n");
     end
 
-    By = parameters.B(y);
-    sg_x = exp(1i*dt*freq_x.*By');
+    Btheta = parameters.B(theta);
+    sg_omega = exp(1i*dt*freq_omega.*Btheta');
 
     ef = angle_to_vec(parameters.ef_angle);
-    c = ff_influence(x);
+    c = ff_influence(omega);
 
     for step = 2:steps
 
@@ -88,19 +88,19 @@ end
         X_n0 = fft(U,[],2);
 
         % apply first semigroup
-        X_n12 = X_n0 .* sg_x;
+        X_n12 = X_n0 .* sg_omega;
 
         % invert Fourier in x and compute second semigroup
         U = real(ifft(X_n12,[],2));
 
-        Ax = parameters.A(x,ef,U,c);
-        sg_y = exp(1i*dt*Ax.*freq_y');
+        Aomega = parameters.A(omega,ef,U,c);
+        sg_theta = exp(1i*dt*Aomega.*freq_theta');
 
         % apply Fourier in y
         Y_n12 = fft(U,[],1);
 
         % apply second semigroup
-        Y_n1 = Y_n12 .* sg_y;
+        Y_n1 = Y_n12 .* sg_theta;
 
         % invert Fourier in y
         U = ifft(Y_n1,[],1);
