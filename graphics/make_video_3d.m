@@ -1,12 +1,10 @@
-function return_data = make_video(x,y,S,parameters,fig,options)
+function return_data = make_video_3d(data,parameters,fig,options)
 %ANIMATE Animate a collection of simulations. Accepts a cell array, each
 %element of which is an 2d array of data: time x particle.
 %
 %last updated 10/07/25 by Adam Petrucci
 arguments (Input)
-    x                       % discretization in x-coordinate
-    y                       % discretization in y-coordinate
-    S                       % surface to plot
+    data
     parameters struct       % parameters used for simulation
     fig                     % figure to work from
 end
@@ -30,7 +28,7 @@ end
     % Define Temporal Parameters
     %****************************
     dt=parameters.dt;       % simulation time step
-    tt=0;               % current time
+    tt=0;                   % current time
     ptfac=parameters.fr;    % frame rate
 
     %****************************
@@ -41,8 +39,7 @@ end
     v.FrameRate = 30;         % Adjust for smoothness
     open(v);
 
-    [X, Y] = ndgrid(x,y); % this breaks make_video for 2d case
-    %[X, Y] = meshgrid(x,y);
+    [X, Y] = meshgrid(x,y);
 
     % Set up annotation for time-keeping
     if ~isempty(time)
@@ -58,18 +55,11 @@ end
             'Color','w');
     end
 
-    s = surf(Y, X, squeeze(S(1,:,:)));
+    s = surf(X, Y, squeeze(S(1,:,:)));
     shading interp;
     view(2);
     colormap(parula);
     colorbar;
-
-    if ~isempty(tr)
-        
-        hold on
-        m = plot3(tr(1,1), tr(2,1), tr(3,1), 'r');
-
-    end
 
     % Parameters for plot
     xlim(ax,[-pi pi]);
@@ -109,4 +99,5 @@ end
     end
 
     return_data = 1;
+
 end

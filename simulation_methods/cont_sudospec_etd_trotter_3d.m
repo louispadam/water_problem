@@ -19,8 +19,9 @@ end
     %****************************
     msz = parameters.m_sz;
     ud = parameters.update;
-    n_omega = parameters.N_x;
-    n_theta = parameters.N_y;
+    n_y = parameters.N_y;
+    n_omega = parameters.N_omega;
+    n_theta = parameters.N_theta;
 
     %******************************
     % Set up Fourier Transform
@@ -58,7 +59,7 @@ end
     si = size(ic);
     time = zeros([1,sz]);
     data = zeros([sz,si]);
-    data(1,:,:) = ic;
+    data(1,:,:,:) = ic;
     
     k = 2;      % counter for storing iteration
     here = round(keep*k);
@@ -76,41 +77,48 @@ end
         fprintf("Began Simulation\n");
     end
 
-    Btheta = parameters.B(theta);
-    sg_omega = exp(1i*dt*freq_omega.*Btheta');
-
-    ef = angle_to_vec(parameters.ef_angle);
-    c = ff_influence(omega);
+    Bomega = parameters.B(omega);
+    %temp1 = exp(1i*dt*freq_theta.*Bomega');
+    %temp2 = reshape(temp1,1, 64, 128);
+    %sg_omega = repmat(temp2,32,1,1);
+    %size(sg_omega)
+    sg_omega = reshape(exp(1i*dt*freq_theta.*Bomega'),...
+                       1, n_omega, n_theta) .* ones(n_y, 1, 1);
+    %sg_omega = exp(1i*dt*freq_theta.*Bomega');
 
     for step = 2:steps
 
-        % take Fourier in x
-        X_n0 = fft(U,[],2);
+        % take Fourier in theta
+        X_n0 = fft(U,[],3);
 
-        % apply first semigroup
+        % apply first semigroup (interesting factor in omega)
         X_n12 = X_n0 .* sg_omega;
 
-        % invert Fourier in x and compute second semigroup
-        U = real(ifft(X_n12,[],2));
+        % invert Fourier in theta and compute second semigroup
+        U = real(ifft(X_n12,[],3));
 
-        Aomega = parameters.A(omega,ef,U,c);
-        sg_theta = exp(1i*dt*Aomega.*freq_theta');
+        Atheta = parameters.A(U);
+        sg_theta = exp(1i*dt*reshape(Atheta,n_y,1,n_theta).*...
+                             reshape(freq_omega,1,n_omega,1));
+        %sg_theta = exp(1i*dt*Atheta.*freq_omega');
+        %size(sg_theta)
 
-        % apply Fourier in y
-        Y_n12 = fft(U,[],1);
 
-        % apply second semigroup
+        % apply Fourier in omega
+        Y_n12 = fft(U,[],2);
+
+        % apply second semigroup (interesting factor in theta)
         Y_n1 = Y_n12 .* sg_theta;
 
-        % invert Fourier in y
-        U = ifft(Y_n1,[],1);
+        % invert Fourier in omega
+        U = ifft(Y_n1,[],2);
 
         tt=tt+dt;
 
         % Store result at previously calculated frequency
         if step == here
             time(k) = tt;
-            data(k,:,:) = real(U);
+            data(k,:,:,:) = real(U);
             k = k+1;
             here = round(keep*k);
         end

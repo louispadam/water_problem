@@ -79,6 +79,12 @@ end
     By = parameters.B(y);
     sg_x = exp(1i*dt*freq_x.*By');
 
+    if k==2
+        size(By)
+        size(freq_x)
+        size(sg_x)
+    end
+
     ef = angle_to_vec(parameters.ef_angle);
     c = ff_influence(x);
 
@@ -95,6 +101,10 @@ end
 
         Ax = parameters.A(x,ef,U,c);
         sg_y = exp(1i*dt*Ax.*freq_y');
+
+        if k==2
+            size(sg_y)
+        end
 
         % apply Fourier in y
         Y_n12 = fft(U,[],1);

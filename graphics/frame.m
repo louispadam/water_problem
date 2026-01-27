@@ -30,7 +30,7 @@ end
     %****************************
 
     % Plot
-    surf(X, Y, S);
+    surf(Y, X, S);
     shading interp;
     view(2);
     colormap(parula);
