@@ -14,6 +14,8 @@ arguments (Input)
     options.Title = ""      % title of axis
     options.Time = []
     options.Trajectory = []
+    options.xLabel = 'X'
+    options.yLabel = 'Y'
 end
 
     %****************************
@@ -74,8 +76,8 @@ end
     % Parameters for plot
     xlim(ax,[-pi pi]);
     ylim(ax,[-pi pi]);
-    ylabel(ax,'Y');
-    xlabel(ax,'X');
+    ylabel(ax,options.yLabel);
+    xlabel(ax,options.xLabel);
     title(ax,tit,'Fontsize',18,'FontWeight', 'bold')
 
     for ind = 1:length(time)

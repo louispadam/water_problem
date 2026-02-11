@@ -1,7 +1,5 @@
 *main*
 *.asv
-*private*
-*experiment*
-images
 *.png
 *.mp4
+media/

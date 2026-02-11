@@ -15,7 +15,9 @@ function return_data = boiler_plate()
         'pr',1, ...        % pause rate
         'm_sz',1, ...      % max vector size
         'update',false, ...   % print progress of simulation
-        'ef_angle',0);
+        'ef_angle',0, ...
+        'ker_pow',1, ...
+        'ef_pow',1);
 
     return_data = parameters;
 

@@ -27,12 +27,16 @@ end
     theta = linspace(-pi,pi, params.N_theta);
     [Omega_2, Theta_2] = ndgrid(omega,theta);
 
+    M = max(data,[],'all');
+
     for i = 1:layers
+        ax = nexttile;
         layer = floor((i-1)*params.N_y/layers)+1;
-        frame(Omega_2,Theta_2,squeeze(data(layer,:,:)),params,nexttile,...
+        frame(Omega_2,Theta_2,squeeze(data(layer,:,:)),params,ax,...
         "Title",sprintf('Slice %0.2f',i/layers),...
         "xaxis","none",...
         "yaxis","none");
+        ax.CLim = [0,M];
     end
 
     title(tl,options.Title)

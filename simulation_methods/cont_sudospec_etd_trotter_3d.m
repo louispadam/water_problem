@@ -86,6 +86,8 @@ end
                        1, n_omega, n_theta) .* ones(n_y, 1, 1);
     %sg_omega = exp(1i*dt*freq_theta.*Bomega');
 
+    temp = [];
+
     for step = 2:steps
 
         % take Fourier in theta
@@ -98,6 +100,7 @@ end
         U = real(ifft(X_n12,[],3));
 
         Atheta = parameters.A(U);
+        temp(end+1) = sum(abs(Atheta),"all");
         sg_theta = exp(1i*dt*reshape(Atheta,n_y,1,n_theta).*...
                              reshape(freq_omega,1,n_omega,1));
         %sg_theta = exp(1i*dt*Atheta.*freq_omega');
@@ -139,5 +142,16 @@ end
     if ud
         fprintf('Completed Simulation in %f seconds\n',toc)
     end
+
+    use_frame = figure(8);
+    clf(use_frame);
+    ax = axes(use_frame);
+    plot(temp)
+
+    title(ax,"Strength of Full Interaction")
+    xlabel(ax,"Time (scaled)")
+    ylabel(ax,'L^1 of Interaction Matrix')
+
+    saveas(figure(8),'look_at_full_ker.png')
 
 end
