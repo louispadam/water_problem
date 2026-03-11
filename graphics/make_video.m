@@ -1,8 +1,9 @@
 function return_data = make_video(x,y,S,parameters,fig,options)
-%ANIMATE Animate a collection of simulations. Accepts a cell array, each
-%element of which is an 2d array of data: time x particle.
+%MAKE_VIDEO Animate data in omega and theta (so no spatial representation).
+%Everything gets plotted into inputted axis. Accomplishes effectively the
+%same thing as the graphics/animate but stores the result in an mp4 file.
 %
-%last updated 10/07/25 by Adam Petrucci
+%last updated 03/10/26 by Adam Petrucci
 arguments (Input)
     x                       % discretization in x-coordinate
     y                       % discretization in y-coordinate
@@ -12,10 +13,10 @@ arguments (Input)
 end
 arguments (Input)
     options.Title = ""      % title of axis
-    options.Time = []
-    options.Trajectory = []
-    options.xLabel = 'X'
-    options.yLabel = 'Y'
+    options.Time = []       % time data
+    options.Trajectory = [] % trajectory to plot
+    options.xLabel = 'X'    % x-label of figure
+    options.yLabel = 'Y'    % y-label of figure
 end
 
     %****************************

@@ -1,6 +1,12 @@
 function [return_time, return_data]=cont_sudospec_etd_trotter_3d(initial,parameters)
+%CONT_SUDOSPEC_ETD_TROTTER_3d Deciphering the name: CONT to designate the
+%method for a continuous model (as opposed to discrete/particle), SUDOSPEC
+%because it's a pseudospectral method, ETD stands for exponential
+%time-differencing (to help with numerical heating), and TROTTER for the
+%use of a TROTTERIZATION scheme. This particular method is based on our
+%model with two spatial dimensions.
 %
-%last updated 11/07/25 by Adam Petrucci
+%last updated 03109/26 by Adam Petrucci
 arguments
     initial             % initial conditions
     parameters struct   % parameters for simulation
@@ -77,16 +83,13 @@ end
         fprintf("Began Simulation\n");
     end
 
+    % compute velocity
     Bomega = parameters.B(omega);
-    %temp1 = exp(1i*dt*freq_theta.*Bomega');
-    %temp2 = reshape(temp1,1, 64, 128);
-    %sg_omega = repmat(temp2,32,1,1);
-    %size(sg_omega)
     sg_omega = reshape(exp(1i*dt*freq_theta.*Bomega'),...
                        1, n_omega, n_theta) .* ones(n_y, 1, 1);
-    %sg_omega = exp(1i*dt*freq_theta.*Bomega');
 
-    temp = [];
+    % instantiate vector for storing strength of acceleration
+    acc_strength = [];
 
     for step = 2:steps
 
@@ -99,13 +102,13 @@ end
         % invert Fourier in theta and compute second semigroup
         U = real(ifft(X_n12,[],3));
 
+        % compute acceleration (state-dependent)
         Atheta = parameters.A(U);
-        temp(end+1) = sum(abs(Atheta),"all");
         sg_theta = exp(1i*dt*reshape(Atheta,n_y,1,n_theta).*...
                              reshape(freq_omega,1,n_omega,1));
-        %sg_theta = exp(1i*dt*Atheta.*freq_omega');
-        %size(sg_theta)
 
+        % save strength of acceleration
+        acc_strength(end+1) = sum(abs(Atheta),"all")/sum(ones(size(Atheta)),"all");
 
         % apply Fourier in omega
         Y_n12 = fft(U,[],2);
@@ -116,6 +119,7 @@ end
         % invert Fourier in omega
         U = ifft(Y_n1,[],2);
 
+        % update time
         tt=tt+dt;
 
         % Store result at previously calculated frequency
@@ -133,25 +137,29 @@ end
         end
 
     end
+    
+    % update if desired
+    if ud
+
+        fprintf('Completed Simulation in %f seconds\n',toc)
+
+        % Plot strength of acceleration (interaction + electric field) over
+        % time
+        use_frame = figure(8);
+        clf(use_frame);
+        ax = axes(use_frame);
+        plot(acc_strength)
+
+        title(ax,"Strength of Acceleration Term")
+        xlabel(ax,"Iterate")
+        ylabel(ax,'L^1 of Acceleration')
+
+        saveas(figure(8),'temp_interaction_strength.png')
+
+    end
 
     % Return data
     return_time = time;
     return_data = data;
-
-    % update if desired
-    if ud
-        fprintf('Completed Simulation in %f seconds\n',toc)
-    end
-
-    use_frame = figure(8);
-    clf(use_frame);
-    ax = axes(use_frame);
-    plot(temp)
-
-    title(ax,"Strength of Full Interaction")
-    xlabel(ax,"Time (scaled)")
-    ylabel(ax,'L^1 of Interaction Matrix')
-
-    saveas(figure(8),'look_at_full_ker.png')
 
 end

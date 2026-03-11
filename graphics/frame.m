@@ -1,8 +1,8 @@
 function return_data = frame(X,Y,S,parameters,axis,options)
-%FRAME Present simulation data on a provided axis handle. Accepts a cell
-% array, each element of which is a vector of particles.
+%FRAME Present simulation data in only omega and theta on a provided axis
+%handle.
 %
-%last updated 10/07/25
+%last updated 03/10/26
 arguments (Input)
     X                       % mesh for x-coordinate
     Y                       % mesh for y-coordinate
@@ -11,9 +11,9 @@ arguments (Input)
     axis                    % axis to format
 end
 arguments (Input)
-    options.Title = ""                      % title of axis
-    options.xaxis = "X"
-    options.yaxis = "Y"
+    options.Title = ""      % title of axis
+    options.xaxis = "X"     % x-label of figure
+    options.yaxis = "Y"     % y-label of figure
 end
 
     %****************************

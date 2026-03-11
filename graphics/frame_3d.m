@@ -1,6 +1,9 @@
 function return_data = frame_3d(fig_num, data, params, options)
-%UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here
+%FRAME_3d Present simulation data in omega, theta, and y by fitting regular
+%(low dimensional) frames into a tiled layout, each tile representing a y
+%value.
+%
+%last updated 03/10/26
 arguments (Input)
     fig_num                    % figure number
     data                       % data to plot
@@ -29,6 +32,7 @@ end
 
     M = max(data,[],'all');
 
+    % cycle through frames
     for i = 1:layers
         ax = nexttile;
         layer = floor((i-1)*params.N_y/layers)+1;

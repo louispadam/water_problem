@@ -1,6 +1,11 @@
 function [return_time, return_data]=cont_sudospec_etd_trotter(initial,parameters)
+%CONT_SUDOSPEC_ETD_TROTTER Deciphering the name: CONT to designate the
+%method for a continuous model (as opposed to discrete/particle), SUDOSPEC
+%because it's a pseudospectral method, ETD stands for exponential
+%time-differencing (to help with numerical heating), and TROTTER for the
+%use of a TROTTERIZATION scheme.
 %
-%last updated 11/07/25 by Adam Petrucci
+%last updated 03/09/26 by Adam Petrucci
 arguments
     initial             % initial conditions
     parameters struct   % parameters for simulation
@@ -25,7 +30,6 @@ end
     %******************************
     % Set up Fourier Transform
     %******************************
-
     x = linspace(-pi, pi, n_x);
     y = linspace(-pi, pi, n_y);
 
@@ -79,12 +83,6 @@ end
     By = parameters.B(y);
     sg_x = exp(1i*dt*freq_x.*By');
 
-    if k==2
-        size(By)
-        size(freq_x)
-        size(sg_x)
-    end
-
     ef = angle_to_vec(parameters.ef_angle);
     c = ff_influence(x);
 
@@ -101,10 +99,6 @@ end
 
         Ax = parameters.A(x,ef,U,c);
         sg_y = exp(1i*dt*Ax.*freq_y');
-
-        if k==2
-            size(sg_y)
-        end
 
         % apply Fourier in y
         Y_n12 = fft(U,[],1);

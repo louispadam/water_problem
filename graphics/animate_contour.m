@@ -1,17 +1,22 @@
-function return_data = make_video_3d(data,parameters,fig,options)
-%ANIMATE Animate a collection of simulations. Accepts a cell array, each
-%element of which is an 2d array of data: time x particle.
+function return_data = animate_contour(y,omega,theta,S,parameters,fig,options)
+%ANIMATE_CONTOUR Animate a countour plot in the high-dimensional model.
+%Automatically saves the animation in an mp4 file named output.
 %
-%last updated 10/07/25 by Adam Petrucci
+%last updated 03/10/26 by Adam Petrucci
 arguments (Input)
-    data
+    y                       % discretization in y-coordinate
+    omega                   % discretization in omega-coordinate
+    theta                   % discretization in theta-coordinate    
+    S                       % surface data to plot
     parameters struct       % parameters used for simulation
-    fig                     % figure to work from
+    fig                     % fig to build in
 end
 arguments (Input)
     options.Title = ""      % title of axis
-    options.Time = []
-    options.Trajectory = []
+    options.Time = []       % time data
+    options.xLabel = 'X'    % x-label for figure
+    options.yLabel = 'Y'    % y-label for figure
+    options.zLabel = 'Z'    % z-label for figure
 end
 
     %****************************
@@ -22,7 +27,6 @@ end
     ax = axes(fig);
     tit = options.Title;
     time = options.Time;
-    tr = options.Trajectory;
 
     %****************************
     % Define Temporal Parameters
@@ -39,13 +43,11 @@ end
     v.FrameRate = 30;         % Adjust for smoothness
     open(v);
 
-    [X, Y] = meshgrid(x,y);
-
     % Set up annotation for time-keeping
     if ~isempty(time)
         p = ax.Position;
         a = annotation('textbox', ...
-            [p(1)+0.7*p(3),p(2)+0.9*p(4), 0.1, 0.1], ...
+            [0.7,0.9, 0.1, 0.1], ...
             'String', sprintf('Time: %d',time(1)), ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center', ...
@@ -55,17 +57,28 @@ end
             'Color','w');
     end
 
-    s = surf(X, Y, squeeze(S(1,:,:)));
-    shading interp;
-    view(2);
-    colormap(parula);
-    colorbar;
+    data_slice = squeeze(S(1,:,:,:));
+    cut = 0.9 * max(data_slice,[],"all");
+
+    % There's some meshgrid vs ndgrid ordering nonsense here
+    p = patch(ax,isosurface(omega,y,theta,data_slice,cut));
+    isonormals(omega,y,theta,data_slice,p);
+
+    set(p,'FaceColor','red','EdgeColor','none');
+
+    daspect(ax,[1 1 1]);
+    view(ax,3);
+    camlight(ax);
+    lighting(ax,'gouraud')
+
+    xlim([-pi pi])
+    ylim([-pi pi])
+    zlim([-pi pi])
 
     % Parameters for plot
-    xlim(ax,[-pi pi]);
-    ylim(ax,[-pi pi]);
-    ylabel(ax,'Y');
-    xlabel(ax,'X');
+    ylabel(ax,options.yLabel);
+    xlabel(ax,options.xLabel);
+    zlabel(ax,options.zLabel);
     title(ax,tit,'Fontsize',18,'FontWeight', 'bold')
 
     for ind = 1:length(time)
@@ -73,19 +86,14 @@ end
         if mod(ind, ptfac) == 0 % I should be able to speed this up by
                                 % putting it in the for loop
 
-            %cla(ax,'reset');
-
             % Collect slices of data for current frame
-            to_send = squeeze(S(ind,:,:));
+            data_slice = squeeze(S(ind,:,:,:));
+            cut = 0.9 * max(data_slice,[],"all");
 
             % Display frame for given time
-            s.ZData = to_send;
-
-            if ~isempty(tr)
-                m.XData = tr(1,1:ind);
-                m.YData = tr(2,1:ind);
-                m.ZData = tr(3,1:ind);
-            end
+            p = patch(ax,isosurface(omega,y,theta,data_slice,cut));
+            isonormals(omega,y,theta,data_slice,p)
+            set(p,'FaceColor','red','EdgeColor','none')
 
             % Update annotation tracking time
             if ~isempty(time)
@@ -99,5 +107,4 @@ end
     end
 
     return_data = 1;
-
 end
