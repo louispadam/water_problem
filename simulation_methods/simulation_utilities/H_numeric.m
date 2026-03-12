@@ -3,16 +3,18 @@ function return_data = H_numeric(params)
 %the exact solution integrates out a spatial dimension exactly, whereas
 %it's computed numerically here.
 %
-%last updated 03/10/26 by Adam Petrucci
+%last updated 03/11/26 by Adam Petrucci
+
+    L = 2*params.y_bound;
 
     % set up important discretizations
     % discretization in x-dimension is significantly finer than in y to
     % reduce error from quadrature
-    y = linspace(-pi,pi,params.N_y);
-    x = linspace(-pi,pi,128*params.N_y);
+    y = linspace(-params.y_bound,params.y_bound,params.N_y);
+    x = linspace(-params.y_bound,params.y_bound,128*params.N_y);
 
-    x_dists = periodic_influence(0,x,2*pi);
-    y_dists = periodic_influence(0,y,2*pi);
+    x_dists = periodic_influence(0,x,L);
+    y_dists = periodic_influence(0,y,L);
 
     [conv_X, conv_Y] = ndgrid(x_dists,y_dists);
 

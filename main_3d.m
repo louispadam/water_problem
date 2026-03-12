@@ -12,8 +12,10 @@ disp('Ran Boilerplate')
 
 %% Set up problem
 
+parameters.y_bound  = pi;
+parameters.w_bound  = 2*pi;
 parameters.N_y      = 2^5;
-parameters.N_omega  = 2^6;
+parameters.N_omega  = 2^7;
 parameters.N_theta  = 2^7;
 parameters.dt       = 0.005;
 parameters.tfin     = 10;
@@ -33,8 +35,8 @@ disp('Set Parameters')
 %% Set Initial Conditions
 
 % Set up discretization
-y = linspace(-pi, pi, parameters.N_y);
-omega = linspace(-pi, pi, parameters.N_omega);
+y = linspace(-parameters.y_bound, parameters.y_bound, parameters.N_y);
+omega = linspace(-parameters.w_bound, parameters.w_bound, parameters.N_omega);
 theta = linspace(-pi,pi, parameters.N_theta);
 
 [Omega_2, Theta_2] = ndgrid(omega,theta);
@@ -76,16 +78,58 @@ parameters.B = @(z) B(z);
 
 disp('Done defining interaction')
 
+%% Run simulation
+
+[t_c, d_c] = cont_sudospec_etd_trotter_3d(ic,parameters);
+
+disp('Done Simulating')
+
+%% Animate contour plot
+
+animate_contour(y,omega,theta,d_c,parameters,figure(4), ...
+    'Title',sprintf("testing testing"), ...
+    'Time',t_c,...
+    'xLabel','\theta',...
+    'yLabel','\omega',...
+    'zLabel','another');
+
+disp('Done making contour video')
+
+%% Visualize final middle slice
+
+initial_frame = figure(5);
+clf(initial_frame);
+ax = axes(initial_frame);
+
+frame(Omega_2,Theta_2,squeeze(d_c(end,round(parameters.N_y/2),:,:)),parameters,ax,...
+      "Title","Final State (everything)", ...
+      'xaxis','\theta',...
+      'yaxis','\omega');
+
+saveas(figure(5),'final.png')
+
+disp('Done Visualizing FC')
+
+%% Make video of middle slice
+
+make_video(omega,theta,squeeze(d_c(:,round(parameters.N_y/2),:,:)),parameters,figure(4), ...
+    'Title','Test Without Electric Field (\nu=0.01, \delta=0.001)', ...
+    'Time',t_c,...
+    'xLabel','\theta',...
+    'yLabel','\omega');
+
+disp('Done making middle-slice video')
+
 %% Visualize convolution kernel
 
 parameters.del = 0.001;
 
 parameters.N_y = 2^5;
-y_coarse = linspace(-pi, pi, parameters.N_y);
+y_coarse = linspace(-parameters.y_bound, parameters.y_bound, parameters.N_y);
 H_data_coarse = H_exact(parameters);
 
 parameters.N_y = 2^9;
-y_fine = linspace(-pi, pi, parameters.N_y);
+y_fine = linspace(-parameters.y_bound, parameters.y_bound, parameters.N_y);
 H_data_fine = H_exact(parameters);
 
 convolution_coarse_frame = figure(1);
@@ -129,11 +173,13 @@ disp('Plotted convolution kernels')
 
 function return_data = get_continuous_piece(params)
 
-    L = 2*pi;
+    L = 2*params.y_bound;
     d = params.del;
-    fi = linspace(-pi,pi,params.N_y);
+
+    fi = linspace(-params.y_bound,params.y_bound,params.N_y);
     inp = periodic_influence(0,fi,2*pi);
     jb = jap_brac(inp,d);
+
     t1f1 = (d^2-inp.^2)./(jb.^2) - 1;
     t1f2 = (2*L./(L^2+4*jb.^2));
 
@@ -143,11 +189,13 @@ end
 
 function return_data = get_singular_piece(params)
 
-    L = 2*pi;
+    L = 2*params.y_bound;
     d = params.del;
-    fi = linspace(-pi,pi,params.N_y);
+
+    fi = linspace(-params.y_bound,params.y_bound,params.N_y);
     inp = periodic_influence(0,fi,2*pi);
     jb = jap_brac(inp,d);
+
     t2f1 = 1+((d^2-inp.^2)./(jb.^2));
     t2f2 = atan(L./(2*jb))./jb;
 
@@ -187,45 +235,3 @@ saveas(figure(1),'convolution_first_component.png')
 saveas(figure(2),'convolution_second_component.png')
 
 disp('Done splitting convolution kernel')
-
-%% Run simulation
-
-[t_c, d_c] = cont_sudospec_etd_trotter_3d(ic,parameters);
-
-disp('Done Simulating')
-
-%% Animate contour plot
-
-animate_contour(y,omega,theta,d_c,parameters,figure(4), ...
-    'Title',sprintf("testing testing"), ...
-    'Time',t_c,...
-    'xLabel','\theta',...
-    'yLabel','\omega',...
-    'zLabel','another');
-
-disp('Done making contour video')
-
-%% Visualize final middle slice
-
-initial_frame = figure(5);
-clf(initial_frame);
-ax = axes(initial_frame);
-
-frame(Omega_2,Theta_2,squeeze(d_c(end,round(parameters.N_y/2),:,:)),parameters,ax,...
-      "Title","Final State (everything)", ...
-      'xaxis','\theta',...
-      'yaxis','\omega');
-
-saveas(figure(5),'final.png')
-
-disp('Done Visualizing FC')
-
-%% Make video of middle slice
-
-make_video(omega,theta,squeeze(d_c(:,round(parameters.N_y/2),:,:)),parameters,figure(4), ...
-    'Title','Test Without Electric Field (\nu=0.01, \delta=0.001)', ...
-    'Time',t_c,...
-    'xLabel','\theta',...
-    'yLabel','\omega');
-
-disp('Done making middle-slice video')

@@ -3,10 +3,12 @@ function return_data = boiler_plate()
 %simulation of water. I recommend calling this function at the beginning of
 %any experiment and modifying parameter values from there.
 %
-%last updated 03/09/26 by Adam Petrucci
+%last updated 03/11/26 by Adam Petrucci
 
     % Generate parameter structure
     parameters = struct(...
+        'y_bound',...         % bound in spatial y-dim
+        'w_bound',...         % bound in omega
         'N_x',1,...           % x discretization in 1 spatial dim
         'N_y',1,...           % y discretization in 2 and 3 spatial dim
         'N_omega',1,...       % omega discretization in 3 spatial dim

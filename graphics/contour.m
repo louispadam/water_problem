@@ -44,8 +44,8 @@ end
     camlight(ax)
     lighting(ax,'gouraud')
 
-    xlim(ax,[-pi pi])
-    ylim(ax,[-pi pi])
+    xlim(ax,[-parameters.w_bound parameters.w_bound])
+    ylim(ax,[-parameters.y_bound parameters.y_bound])
     zlim(ax,[-pi pi])
 
     % Parameters for plot

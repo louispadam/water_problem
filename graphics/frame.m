@@ -44,8 +44,9 @@ end
         xlabel(ax,xlab);
     end
     title(ax,tit,'Fontsize',18,'FontWeight', 'bold')
+    % maybe be problems here if we return to lower dim simulation
     xlim(ax,[-pi pi]);
-    ylim(ax,[-pi pi]);
+    ylim(ax,[-parameters.w_bound parameters.w_bound]);
 
     return_data = ax;
 

@@ -3,9 +3,10 @@ function [return_time, return_data]=cont_sudospec_etd_trotter(initial,parameters
 %method for a continuous model (as opposed to discrete/particle), SUDOSPEC
 %because it's a pseudospectral method, ETD stands for exponential
 %time-differencing (to help with numerical heating), and TROTTER for the
-%use of a TROTTERIZATION scheme.
+%use of a TROTTERIZATION scheme. Note: this function only works on
+%[-pi,pi]^2, it is not adapted to handle any other bounds.
 %
-%last updated 03/09/26 by Adam Petrucci
+%last updated 03/11/26 by Adam Petrucci
 arguments
     initial             % initial conditions
     parameters struct   % parameters for simulation

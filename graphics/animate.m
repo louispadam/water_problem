@@ -68,7 +68,7 @@ end
 
     % Parameters for plot
     xlim(ax,[-pi pi]);
-    ylim(ax,[-pi pi]);
+    ylim(ax,[-parameters.w_bound parameters.w_bound]);
     ylabel(ax,'Y');
     xlabel(ax,'X');
     title(ax,tit,'Fontsize',18,'FontWeight', 'bold')

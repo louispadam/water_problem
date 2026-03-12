@@ -6,7 +6,7 @@ function [return_time, return_data]=cont_sudospec_etd_trotter_3d(initial,paramet
 %use of a TROTTERIZATION scheme. This particular method is based on our
 %model with two spatial dimensions.
 %
-%last updated 03109/26 by Adam Petrucci
+%last updated 03/11/26 by Adam Petrucci
 arguments
     initial             % initial conditions
     parameters struct   % parameters for simulation
@@ -28,12 +28,13 @@ end
     n_y = parameters.N_y;
     n_omega = parameters.N_omega;
     n_theta = parameters.N_theta;
+    o_b = parameters.w_bound;
 
     %******************************
     % Set up Fourier Transform
     %******************************
 
-    omega = linspace(-pi, pi, n_omega);
+    omega = linspace(-o_b, o_b, n_omega);
     theta = linspace(-pi, pi, n_theta);
 
     domega = omega(2) - omega(1);
