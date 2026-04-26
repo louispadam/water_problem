@@ -15,7 +15,7 @@ disp('Ran Boilerplate')
 parameters.N_x      = 2^7;
 parameters.N_y      = 2^7;
 parameters.dt       = 0.001;
-parameters.tfin     = 5;
+parameters.tfin     = 30;
 parameters.fr       = 50; 
 parameters.pr       = 0.002;
 parameters.m_sz     = 15*(2^10)^3/(8*parameters.N_x*parameters.N_y);
@@ -63,15 +63,15 @@ function return_data = A(z,e,f,c)
     % Electric field
     % I changed angle_to_vec while working on 3d problem so this is
     % problaby broken now
-    %vec = sum((0-1*e) .* angle_to_perp(z'),2);
-    %return_data = vec';
+    vec = sum((0-1*e) .* angle_to_perp(z),1);
+    %return_data = vec;
 
     % Convolution
     % This one works a little differently, rather than outputting the value
     % at a specific angle, it outputs at all angles
     no_vel = trapz(f,1);
     real_interaction = conv(c,no_vel,"same");
-    return_data = -real_interaction/max(real_interaction);
+    return_data = -real_interaction/max(real_interaction)+vec;
 
 end
 
@@ -98,8 +98,10 @@ final_frame = figure(2);
 clf(final_frame);
 ax = axes(final_frame);
 
-frame(X,Y,squeeze(d_c(end,:,:)),parameters,ax,...
-      "Title","Final State");
+frame(X,Y,squeeze(d_c(end,:,:))',parameters,ax,...
+      "Title","Final State", ...
+      "xaxis","\theta", ...
+      "yaxis","\omega");
 
 %hold on
 %m = plot3(squeeze(traj(1,:)), squeeze(traj(2,:)), squeeze(traj(3,:)), 'r');
@@ -121,7 +123,9 @@ disp('Done animation')
 %% Test make_video
 
 make_video(x,y,d_c,parameters,figure(4), ...
-    'Title',"Stockmayer with Interactive Forcing", ...
-    'Time',t_c);
+    'Title',"Time Series for Water", ...
+    'Time',t_c, ...
+    'xLabel','\theta', ...
+    'yLabel','\omega');
 
 disp('Done making video')

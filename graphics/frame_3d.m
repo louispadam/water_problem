@@ -26,7 +26,7 @@ end
     tl.Padding = 'compact';
     tl.TileSpacing = 'compact';
 
-    omega = linspace(-pi, pi, params.N_omega);
+    omega = linspace(-params.w_bound, params.w_bound, params.N_omega);
     theta = linspace(-pi,pi, params.N_theta);
     [Omega_2, Theta_2] = ndgrid(omega,theta);
 

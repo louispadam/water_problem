@@ -13,8 +13,8 @@ disp('Ran Boilerplate')
 %% Set up problem
 
 parameters.y_bound  = pi;
-parameters.w_bound  = 2*pi;
-parameters.N_y      = 2^5;
+parameters.w_bound  = 10*pi;
+parameters.N_y      = 2^6;
 parameters.N_omega  = 2^7;
 parameters.N_theta  = 2^7;
 parameters.dt       = 0.005;
@@ -26,8 +26,8 @@ parameters.m_sz     = 15*(2^10)^3/(8*parameters.N_y*...
                                      parameters.N_omega*...
                                      parameters.N_theta);
 parameters.update   = true;
-parameters.ef_angle = pi/2;
-parameters.ker_pow  = 1/100;
+parameters.ef_angle = pi/4;
+parameters.ker_pow  = 1;
 parameters.ef_pow   = 0;
 
 disp('Set Parameters')
@@ -43,10 +43,9 @@ theta = linspace(-pi,pi, parameters.N_theta);
 [Y_3, Omega_3, Theta_3] = ndgrid(y,omega,theta);
 
 % Construct initial conditions in each dimension
-y_side     = exp(-5*(y+0*pi).^2);
-omega_side = exp(-10*(omega+0*pi).^2);
-theta_side = exp(-5*(theta+0*pi).^2) + ...
-             exp(-5*(theta-0.3*pi).^2);
+y_side     = ones(1,length(y));
+omega_side = exp(-8*(omega-0*pi).^2);
+theta_side = exp(-8*(theta-1*pi/4).^2);
 
 % Tensor-product them together
 f = y_side' .* omega_side .* reshape(theta_side,1,1,[]);
@@ -56,14 +55,19 @@ ic = f/trapz(y, trapz(omega, trapz(theta, f, 3), 2));
 
 disp('Set Initial Conditions')
 
-%% Visualize initial middle slice
+%% Visualize initial conditions
 
-initial_frame = figure(1);
-clf(initial_frame);
-ax = axes(initial_frame);
-
-frame(Omega_2,Theta_2,squeeze(ic(round(parameters.N_y/2),:,:)),parameters,ax,...
+frame_3d(1,ic,parameters,...
       "Title","Initial State",...
+      "xaxis",'\theta',...
+      "yaxis",'\omega');
+
+finala_frame = figure(2);
+clf(finala_frame);
+ax = axes(finala_frame);
+
+frame(omega,theta,squeeze(ic(round(parameters.N_y/2),:,:)),parameters,ax,...
+      "Title","Initial State (Middle Slice)",...
       "xaxis",'\theta',...
       "yaxis",'\omega');
 
@@ -71,10 +75,13 @@ disp('Done Visualizing IC')
 
 %% Set interaction
 
-conv_data = H_exact(parameters);
+conv_data = H_lim(parameters);
+point_mass = [0,0;0,2*pi];
 
-parameters.A = @(f) A(theta,f,conv_data,parameters);
+parameters.A = @(f) A(theta,f,conv_data,point_mass,parameters);
 parameters.B = @(z) B(z);
+
+%parameters.A(ic);
 
 disp('Done defining interaction')
 
@@ -97,23 +104,26 @@ disp('Done making contour video')
 
 %% Visualize final middle slice
 
-initial_frame = figure(5);
-clf(initial_frame);
-ax = axes(initial_frame);
+frame_3d(1,squeeze(d_c(end,:,:,:)),parameters,...
+      "Title","Final State",...
+      "xaxis",'\theta',...
+      "yaxis",'\omega');
+
+final_frame = figure(2);
+clf(final_frame);
+ax = axes(final_frame);
 
 frame(Omega_2,Theta_2,squeeze(d_c(end,round(parameters.N_y/2),:,:)),parameters,ax,...
       "Title","Final State (everything)", ...
       'xaxis','\theta',...
       'yaxis','\omega');
 
-saveas(figure(5),'final.png')
-
 disp('Done Visualizing FC')
 
 %% Make video of middle slice
 
 make_video(omega,theta,squeeze(d_c(:,round(parameters.N_y/2),:,:)),parameters,figure(4), ...
-    'Title','Test Without Electric Field (\nu=0.01, \delta=0.001)', ...
+    'Title','Test Without Electric Field)', ...
     'Time',t_c,...
     'xLabel','\theta',...
     'yLabel','\omega');
